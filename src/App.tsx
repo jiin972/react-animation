@@ -1,6 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 import styled from "styled-components";
-import { motion, type Variants } from "framer-motion"; //Variants 타입을 import
+import { delay, motion, stagger, type Variants } from "framer-motion"; //Variants 타입을 import
 
 export const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -68,8 +68,9 @@ const Wrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 40px;
+  gap: 60px;
   padding: 20px;
 `;
 
@@ -77,40 +78,79 @@ const Box = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  place-items: center;
   width: 150px;
   height: 150px;
-  background-color: rgba(0, 0, 0, 0.2);
-  background-size: cover;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2); // 더 자연스러운 그림자를 만들기 위한 CSS기법
+`;
+const GestureBox = styled(motion.div)`
+  width: 150px;
+  height: 150px;
+  background-color: white;
   background-repeat: no-repeat;
   background-position: center;
-  border-radius: 15px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.3); // 더 자연스러운 그림자를 만들기 위한 CSS기법
+  border-radius: 25px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2); // 더 자연스러운 그림자를 만들기 위한 CSS기법
 `;
 
-const Cricle = styled.div`
+const Cricle = styled(motion.div)`
   width: 50px;
   height: 50px;
   border-radius: 50%;
   background-color: white;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.3); // 더 자연스러운 그림자를 만들기 위한 CSS기법
+  place-self: center; //
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2); // 더 자연스러운 그림자를 만들기 위한 CSS기법
 `;
 
-const myVars: Variants = {
-  //Variants 타입을 정의
-  start: { scale: 0 },
-  end: { scale: 1, rotateZ: 360, transition: { type: "spring", delay: 1 } },
+const boxVairant: Variants = {
+  start: { opacity: 0, scale: 0.5 },
+  end: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: "spring",
+      duration: 0.7,
+      delay: 0.5,
+      bounce: 0.5,
+      delayChildren: stagger(0.5, { startDelay: 0.7 }),
+    },
+  },
+};
+
+const circleVariant: Variants = {
+  start: { opacity: 0, y: 10 },
+  end: {
+    opacity: 1,
+    y: 0,
+  },
+};
+
+const gestureBoxVariant: Variants = {
+  hover: { scale: 1.4, rotateZ: 90 },
+  click: { scale: 1, borderRadius: "50%" },
+  drag: {
+    backgroundColor: "rgb(253, 203, 110)",
+    transition: { duration: 1 },
+  },
 };
 
 function App() {
   return (
     <Wrapper>
-      <Box variants={myVars} initial="start" animate="end">
-        <Cricle />
-        <Cricle />
-        <Cricle />
-        <Cricle />
+      <Box drag variants={boxVairant} initial="start" animate="end">
+        <Cricle variants={circleVariant} />
+        <Cricle variants={circleVariant} />
+        <Cricle variants={circleVariant} />
+        <Cricle variants={circleVariant} />
       </Box>
+      <GestureBox
+        drag
+        variants={gestureBoxVariant}
+        whileDrag="drag"
+        whileHover="hover"
+        whileTap="click"
+      />
     </Wrapper>
   );
 }

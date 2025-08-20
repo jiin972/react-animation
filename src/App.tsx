@@ -4,10 +4,11 @@ import {
   motion,
   stagger,
   useMotionValue,
+  useScroll,
   useTransform,
   type Variants,
 } from "framer-motion"; //Variants 타입을 import
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 export const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -38,8 +39,9 @@ export const GlobalStyle = createGlobalStyle`
   body {
     font-family: "Nanum Gothic Coding", monospace;
     line-height: 1;
-    background:${(props) =>
-      props.theme.background}; //background-color는 단색만 받음,
+    background-color:white;
+   /*  background:${(props) =>
+     props.theme.background}; //background-color는 단색만 받음, */
     color: black
     
 
@@ -69,15 +71,16 @@ export const GlobalStyle = createGlobalStyle`
 
 `;
 
-const Wrapper = styled.div`
+const Wrapper = styled(motion.div)`
+  // MotionBox의 모션 연동을 위해, motion.div로 변경
   margin: auto 0;
-  height: 100vh;
+  height: 200vh;
   width: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  gap: 60px;
+  gap: 150px;
   padding: 20px;
 `;
 
@@ -157,26 +160,35 @@ const MotionBox = styled(motion.div)`
   width: 80px;
   height: 80px;
   background-color: white;
-  background-repeat: no-repeat;
-  background-position: center;
+  border-radius: 25px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2); // 더 자연스러운 그림자를 만들기 위한 CSS기법
+`;
+
+const ScrollBox = styled(motion.div)`
+  width: 80px;
+  height: 80px;
+  background-color: white;
   border-radius: 25px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2); // 더 자연스러운 그림자를 만들기 위한 CSS기법
 `;
 
 function App() {
   const biggerBoxRef = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const scale = useTransform(x, [-155, 0, 170], [2, 1, 0]);
-  useEffect(
-    () =>
-      x.on("change", (latestValue) => {
-        console.log("x의 최신값", x.get());
-        console.log("x의 최신값(콜백인자)", latestValue);
-      }),
-    [x]
+  const x = useMotionValue(0); //motionValue
+  const rotateZ = useTransform(x, [-155, 0, 170], [-360, 0, 360]);
+  const { scrollYProgress } = useScroll();
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 3]);
+  const gradient = useTransform(
+    x,
+    [-155, 0, 170],
+    [
+      "linear-graident(-135deg, rgb(34, 227, 9),rgb(178, 184, 0)",
+      "linear-gradient(0deg,rgb(9, 132, 227),rgb(0, 184, 148)",
+      "linear-gradient(135deg,rgb(227, 9, 24),rgb(0, 184, 148)",
+    ]
   );
   return (
-    <Wrapper>
+    <Wrapper style={{ background: gradient }}>
       <Box drag variants={boxVairant} initial="start" animate="end">
         <Cricle variants={circleVariant} />
         <Cricle variants={circleVariant} />
@@ -194,7 +206,8 @@ function App() {
           whileTap="click"
         />
       </BiggerBox>
-      <MotionBox style={{ x, scale }} drag="x" dragSnapToOrigin />
+      <MotionBox style={{ x, rotateZ }} drag="x" dragSnapToOrigin />
+      <ScrollBox style={{ x, scale }} />
     </Wrapper>
   );
 }

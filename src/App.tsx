@@ -1,6 +1,13 @@
 import { createGlobalStyle } from "styled-components";
 import styled from "styled-components";
-import { delay, motion, stagger, type Variants } from "framer-motion"; //Variants 타입을 import
+import {
+  motion,
+  stagger,
+  useMotionValue,
+  useTransform,
+  type Variants,
+} from "framer-motion"; //Variants 타입을 import
+import { useEffect, useRef } from "react";
 
 export const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -85,8 +92,8 @@ const Box = styled(motion.div)`
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2); // 더 자연스러운 그림자를 만들기 위한 CSS기법
 `;
 const GestureBox = styled(motion.div)`
-  width: 150px;
-  height: 150px;
+  width: 80px;
+  height: 80px;
   background-color: white;
   background-repeat: no-repeat;
   background-position: center;
@@ -135,7 +142,39 @@ const gestureBoxVariant: Variants = {
   },
 };
 
+const BiggerBox = styled.div`
+  width: 300px;
+  height: 300px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+`;
+
+const MotionBox = styled(motion.div)`
+  width: 80px;
+  height: 80px;
+  background-color: white;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 25px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2); // 더 자연스러운 그림자를 만들기 위한 CSS기법
+`;
+
 function App() {
+  const biggerBoxRef = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const scale = useTransform(x, [-155, 0, 170], [2, 1, 0]);
+  useEffect(
+    () =>
+      x.on("change", (latestValue) => {
+        console.log("x의 최신값", x.get());
+        console.log("x의 최신값(콜백인자)", latestValue);
+      }),
+    [x]
+  );
   return (
     <Wrapper>
       <Box drag variants={boxVairant} initial="start" animate="end">
@@ -144,13 +183,18 @@ function App() {
         <Cricle variants={circleVariant} />
         <Cricle variants={circleVariant} />
       </Box>
-      <GestureBox
-        drag
-        variants={gestureBoxVariant}
-        whileDrag="drag"
-        whileHover="hover"
-        whileTap="click"
-      />
+      <BiggerBox ref={biggerBoxRef}>
+        <GestureBox
+          drag
+          dragConstraints={biggerBoxRef}
+          dragSnapToOrigin
+          variants={gestureBoxVariant}
+          whileDrag="drag"
+          whileHover="hover"
+          whileTap="click"
+        />
+      </BiggerBox>
+      <MotionBox style={{ x, scale }} drag="x" dragSnapToOrigin />
     </Wrapper>
   );
 }

@@ -6,9 +6,10 @@ import {
   useMotionValue,
   useScroll,
   useTransform,
+  AnimatePresence,
   type Variants,
 } from "framer-motion"; //Variants 타입을 import
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -74,7 +75,7 @@ export const GlobalStyle = createGlobalStyle`
 const Wrapper = styled(motion.div)`
   // MotionBox의 모션 연동을 위해, motion.div로 변경
   margin: auto 0;
-  height: 300vh;
+  height: 500vh;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -82,6 +83,14 @@ const Wrapper = styled(motion.div)`
   align-items: center;
   gap: 150px;
   padding: 20px;
+`;
+
+const ClickBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 15px;
 `;
 
 const Box = styled(motion.div)`
@@ -162,6 +171,10 @@ const MotionBox = styled(motion.div)`
   background-color: white;
   border-radius: 25px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2); // 더 자연스러운 그림자를 만들기 위한 CSS기법
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
 `;
 
 const ScrollBox = styled(motion.div)`
@@ -190,7 +203,75 @@ const svgVariants: Variants = {
   },
 };
 
+const ShowBox = styled(motion.div)`
+  height: 200px;
+  width: 200px;
+  background-color: white;
+  border-radius: 25px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2); // 더 자연스러운 그림자를 만들기 위한 CSS기법
+`;
+
+const showBoxVariants: Variants = {
+  start: {
+    opacity: 0,
+    scale: 0,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotateZ: 360,
+    transition: {
+      duration: 0.3,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: 10,
+  },
+};
+
+const SliderBox = styled(motion.div)`
+  height: 200px;
+  width: 200px;
+  font-size: 50px;
+  background-color: white;
+  border-radius: 25px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.2); // 더 자연스러운 그림자를 만들기 위한 CSS기법
+`;
+
+const SliderBoxWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const sliderBoxVariants: Variants = {
+  start: {
+    x: 500,
+    opacity: 0,
+    scale: 0,
+  },
+  visible: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.3,
+    },
+  },
+  exit: {
+    x: -500,
+    opacity: 0,
+    scale: 0,
+  },
+};
+
 function App() {
+  const [visible, setVisible] = useState(1);
+  const [showing, setShowing] = useState(false);
+  const toggleShowing = () => setShowing((prev) => !prev);
   const biggerBoxRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0); //motionValue
   const y = useMotionValue(0);
@@ -206,6 +287,7 @@ function App() {
       "linear-gradient(135deg,rgb(227, 9, 24),rgb(0, 184, 148)",
     ]
   );
+  const nextPlease = () => setVisible((prev) => (prev === 10 ? 10 : prev + 1));
   return (
     <Wrapper style={{ background: gradient }}>
       <Box drag variants={boxVairant} initial="start" animate="end">
@@ -225,7 +307,9 @@ function App() {
           whileTap="click"
         />
       </BiggerBox>
-      <MotionBox style={{ x, rotateZ }} drag="x" dragSnapToOrigin />
+      <MotionBox style={{ x, rotateZ }} drag="x" dragSnapToOrigin>
+        Drag me
+      </MotionBox>
       <ScrollBox style={{ y, scale }} />
       <MySvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
         <motion.path
@@ -240,6 +324,49 @@ function App() {
           d="M320.5 437.1C295.3 405.4 280.4 377.7 275.5 353.9C253 265.9 388.1 265.9 365.6 353.9C360.2 378.1 345.3 405.9 320.6 437.1L320.5 437.1zM458.7 510.3C416.6 528.6 375 499.4 339.4 459.8C443.3 329.7 385.5 259.8 320.6 259.8C265.7 259.8 235.4 306.3 247.3 360.3C254.2 389.5 272.5 422.7 301.7 459.8C269.2 495.8 241.2 512.5 216.5 514.7C166.5 522.1 127.4 473.6 145.2 423.6C160.3 384.4 256.9 192.4 261.1 182C276.9 151.9 286.7 124.6 320.5 124.6C352.8 124.6 363.9 150.5 380.9 184.5C416.9 255.1 470.3 362 495.7 423.6C508.9 456.7 494.3 494.9 458.7 510.2zM505.7 374.2C376.8 99.9 369.7 96 320.6 96C275.1 96 255.7 127.7 235.9 168.8C129.7 381.1 119.5 411.2 118.6 413.8C93.4 483.1 145.3 544 208.2 544C229.9 544 268.8 537.9 320.6 481.6C379.3 545.4 421.9 544 433 544C495.9 544.1 547.9 483.1 522.6 413.8C522.6 409.9 505.8 374.9 505.8 374.2L505.8 374.2z"
         ></motion.path>
       </MySvg>
+      <ClickBox>
+        <button
+          style={{
+            backgroundColor: "transparent",
+            border: "2px solid black",
+            borderRadius: 15,
+            cursor: "pointer",
+            width: 100,
+            height: 20,
+          }}
+          onClick={toggleShowing}
+        >
+          Click me!
+        </button>
+        <AnimatePresence>
+          {showing ? (
+            <ShowBox
+              variants={showBoxVariants}
+              initial={"start"}
+              animate={"visible"}
+              exit="exit"
+            />
+          ) : null}
+        </AnimatePresence>
+      </ClickBox>
+      <SliderBoxWrapper>
+        <AnimatePresence>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) =>
+            i === visible ? (
+              <SliderBox
+                variants={sliderBoxVariants}
+                initial="start"
+                animate="visible"
+                exit="exit"
+                key={i}
+              >
+                {i}
+              </SliderBox>
+            ) : null
+          )}
+        </AnimatePresence>
+        <button onClick={nextPlease}>Next</button>
+      </SliderBoxWrapper>
     </Wrapper>
   );
 }

@@ -1,6 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 import styled from "styled-components";
-import { motion, AnimatePresence, type Variants } from "framer-motion"; //Variants 타입을 import
+import { motion, AnimatePresence, type Variants, number } from "framer-motion"; //Variants 타입을 import
 import { useState } from "react";
 
 export const GlobalStyle = createGlobalStyle`
@@ -68,199 +68,98 @@ const Wrapper = styled(motion.div)`
   width: 100%;
   display: flex;
   justify-content: center;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
-`;
-
-const Box = styled(motion.div)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  top: 120px;
-  background-color: black;
-  border-radius: 25px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-  color: white;
-  font-size: 28px;
-`;
-
-const boxNextVariants: Variants = {
-  entry: (isBack: boolean) => {
-    //isBack이 falsy일때, 500(화면의 오른쪽에서 나타남),즉 next 구현
-    return {
-      x: isBack ? -500 : 500,
-      scale: 0,
-      opacity: 0,
-    };
-  },
-  center: { x: 0, scale: 1, opacity: 1, transition: { duration: 0.3 } },
-  exit: (isBack: boolean) => {
-    return {
-      x: isBack ? 500 : -500, // isBack이 true일때, 500(화면 오른쪽으로 사라짐), prev 구현
-      scale: 0,
-      opacity: 0,
-      transition: { duration: 0.3 },
-    };
-  },
-};
-
-const Circle = styled(motion.div)`
-  background-color: rgb(9, 132, 227);
-  width: 75px;
-  height: 75px;
-  border-radius: 50%;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-`;
-const CircleA = styled(motion.div)`
-  background-color: rgb(9, 132, 227);
-  width: 75px;
-  height: 75px;
-  border-radius: 50%;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-`;
-
-const BoxA = styled(motion.div)`
-  margin-top: 350px;
-  display: flex;
-  width: 200px;
-  height: 200px;
-  background-color: white;
-  border-radius: 25px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-  font-size: 28px;
-`;
-const BoxB = styled(motion.div)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 200px;
-  height: 200px;
-  background-color: white;
-  border-radius: 25px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-  color: white;
-  font-size: 28px;
-`;
-
-const WrapperBox = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
-  width: 100%;
 `;
 
 const GridBox = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   width: 80vw;
   gap: 15px;
-  div:first-child,
-  div:last-child {
+  div:nth-child(5n + 1) {
     grid-column: span 2;
   }
+  padding: 30px 10px;
+  grid-auto-flow: dense;
 `;
 
-const LayoutBox = styled(motion.div)`
+const flags = [
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Flag_of_South_Korea.svg/1280px-Flag_of_South_Korea.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Flag_of_Costa_Rica_%28state%29.svg/2560px-Flag_of_Costa_Rica_%28state%29.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Flag_of_the_Cocos_%28Keeling%29_Islands.svg/2560px-Flag_of_the_Cocos_%28Keeling%29_Islands.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/1/11/Flag_of_Sri_Lanka.svg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Flag_of_Belize.svg/960px-Flag_of_Belize.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Flag_of_Turkmenistan.svg/2560px-Flag_of_Turkmenistan.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Flag_of_Lesotho.svg/2560px-Flag_of_Lesotho.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Flag_of_the_Cook_Islands.svg/2560px-Flag_of_the_Cook_Islands.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Flag_of_the_Solomon_Islands.svg/1280px-Flag_of_the_Solomon_Islands.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Flag_of_Canada.svg/2560px-Flag_of_Canada.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_Kenya.svg/2560px-Flag_of_Kenya.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Flag_of_Eswatini.svg/2560px-Flag_of_Eswatini.svg.png",
+];
+
+const LayoutBox = styled(motion.div)<ILayoutBoxProp>`
+  // interface 전달
   height: 100px;
-  background-color: white;
-  border-radius: 15px;
+  background-image: url(${(prop) => prop.bg}); // url이미지로 지정, prop
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-  font-size: 28px;
 `;
 
-const Overlay = styled.div`
+const Overlay = styled(motion.div)`
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
+interface ILayoutBoxProp {
+  // bg Prop의 타입을 정의
+  bg: string;
+}
+
 function App() {
-  const [isClicked, setIsClicked] = useState(false);
-  const toggleIsClicked = () => setIsClicked((prev) => !prev);
-  const [clicked, setClicked] = useState(false);
-  const toggleClicked = () => setClicked((prev) => !prev);
-  const [visible, setVisible] = useState(1);
-  const [back, setBack] = useState(false);
-  const nextPlease = () => {
-    // 무한 루프를 막기 위해 함수로 생성
-    setVisible((prev) => (prev === 10 ? 10 : prev + 1));
-    setBack(false);
-  };
-  const prevPlease = () => {
-    setVisible((prev) => (prev === 1 ? 1 : prev - 1));
-    setBack(true);
-  };
+  const [id, setId] = useState<null | number>(null); // index는 number, useState의 기본은 null
+  console.log(id);
   return (
-    <>
-      <Wrapper>
-        <AnimatePresence mode="sync" custom={back}>
-          <Box
-            custom={back}
-            variants={boxNextVariants}
-            initial="entry"
-            animate="center"
-            exit={"exit"}
-            key={visible}
+    <Wrapper>
+      <GridBox>
+        {flags.map(
+          (
+            flag,
+            index //map flag, index추가
+          ) => (
+            <LayoutBox
+              onClick={() => setId(index)} //index로 update
+              key={index}
+              bg={flag} //index를 이용해 flags 배열에 접근
+              layoutId={String(index)} //layoutId는 string을 받으므로 String으로 변경
+            />
+          )
+        )}
+      </GridBox>
+      <AnimatePresence>
+        {id !== null ? ( //index는 0부터시작, falsy가되어 렌더링이 되지 않을 수 있기때문에,, 모든경우에 ture를 반환하게 조정
+          <Overlay
+            onClick={() => setId(null)}
+            initial={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
+            animate={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}
+            exit={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
           >
-            {visible}
-          </Box>
-        </AnimatePresence>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 15,
-          }}
-        >
-          <button onClick={prevPlease}>prev</button>
-          <button onClick={nextPlease}>next</button>
-        </div>
-        <div className="layout" onClick={toggleClicked}>
-          <BoxA
-            style={{
-              justifyContent: clicked ? "center" : "flex-start",
-              alignItems: clicked ? "center" : "flex-start",
-            }}
-          >
-            <Circle layout transition={{ duration: 0.3 }} />
-          </BoxA>
-        </div>
-        <div
-          style={{ display: "flex", gap: 15 }}
-          className="shared-layout"
-          onClick={toggleIsClicked}
-        >
-          <BoxB>
-            {!isClicked ? (
-              <CircleA layoutId="circle" style={{ borderRadius: "50%" }} /> // isClicked가 false일때, 초기값이 false이므로, 결과적으로 true가 되어 첫 컴포넌트 랜더링
-            ) : null}
-          </BoxB>
-          <BoxB>
-            {isClicked ? (
-              <CircleA
-                layoutId="circle"
-                style={{ borderRadius: 0, scale: 2 }}
-              />
-            ) : null}
-          </BoxB>
-        </div>
-      </Wrapper>
-      <WrapperBox>
-        <GridBox>
-          <LayoutBox />
-          <LayoutBox />
-          <LayoutBox />
-          <LayoutBox />
-        </GridBox>
-        <Overlay></Overlay>
-      </WrapperBox>
-    </>
+            <LayoutBox
+              layoutId={String(id)}
+              bg={flags[id]} // id는 string, index는 number -> Number로 id 변환한 뒤, -1을 해 올바른 인덱스를 얻음
+              style={{ width: 750, height: 400 }}
+            />
+          </Overlay>
+        ) : null}
+      </AnimatePresence>
+    </Wrapper>
   );
 }
 
